@@ -129,3 +129,7 @@ detection/visual/
 trash/
 setr/
 swin/
+
+
+*/wandb/
+*/work_dirs/

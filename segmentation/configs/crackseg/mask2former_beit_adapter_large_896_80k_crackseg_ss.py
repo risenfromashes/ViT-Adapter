@@ -34,7 +34,7 @@ model = dict(
         deform_num_heads=16,
         cffn_ratio=0.25,
         deform_ratio=0.5,
-        with_cp=True,  # set with_cp=True to save memory
+        with_cp=False,  # set with_cp=True to save memory
         interaction_indexes=[[0, 5], [6, 11], [12, 17], [18, 23]],
     ),
     decode_head=dict(
@@ -69,7 +69,7 @@ model = dict(
                         feedforward_channels=4096,
                         num_fcs=2,
                         ffn_drop=0.0,
-                        with_cp=True,  # set with_cp=True to save memory
+                        with_cp=False,  # set with_cp=True to save memory
                         act_cfg=dict(type='ReLU', inplace=True)),
                     operation_order=('self_attn', 'norm', 'ffn', 'norm')),
                 init_cfg=None),
@@ -99,7 +99,7 @@ model = dict(
                     act_cfg=dict(type='ReLU', inplace=True),
                     ffn_drop=0.0,
                     dropout_layer=None,
-                    with_cp=True,  # set with_cp=True to save memory
+                    with_cp=False,  # set with_cp=True to save memory
                     add_identity=True),
                 feedforward_channels=4096,
                 operation_order=('cross_attn', 'norm', 'self_attn', 'norm',
@@ -151,16 +151,16 @@ lr_config = dict(policy='poly',
                  warmup_ratio=1e-6,
                  power=1.0, min_lr=0.0, by_epoch=False)
 
-data = dict(samples_per_gpu=2,
+data = dict(samples_per_gpu=1,
             workers_per_gpu=1,
             train=dict(pipeline=train_pipeline),
             val=dict(pipeline=test_pipeline),
             test=dict(pipeline=test_pipeline))
 runner = dict(type='IterBasedRunner', max_iters=80000)
-optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=8)
+optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=16)
 checkpoint_config = dict(by_epoch=False, interval=1000, max_keep_ckpts=1)
-evaluation = dict(interval=1000, metric='mIoU', save_best='mIoU', pre_eval=True)
-fp16 = dict(loss_scale=dict(init_scale=512))
+evaluation = dict(interval=8000, metric='mIoU', save_best='mIoU', pre_eval=True)
+# fp16 = dict(loss_scale=dict(init_scale=512))
 
 
 log_config = dict(
@@ -170,7 +170,7 @@ log_config = dict(
         dict(
             type='WandbLoggerHook',
             init_kwargs=dict(
-                project='InternImage-H-CrackSeg-80k',       
+                project='ViT-Adapter-L-CrackSeg-80k',       
                 name='exp1'
             )
         )
